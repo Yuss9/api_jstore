@@ -45,7 +45,7 @@ class AppFixtures extends Fixture
             $article = new Article();
             $article->setTitle($faker->text(50));
             $article->setContent($faker->text(6000));
-            $article->setImage($faker->imageUrl());
+            $article->setImage("https://picsum.photos/640/480");
             $article->setCreateAt(new \DateTime());
             $article->addCategory($categories[$faker->numberBetween(0,14)]);
             $article->setAuthor($users[$faker->numberBetween(0,49)]);
