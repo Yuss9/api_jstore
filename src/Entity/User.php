@@ -6,10 +6,19 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraint\Length;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+#[UniqueEntity(fields: ["email"], message: "l'email existe deja")]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -19,15 +28,20 @@ class User
     #[ORM\Column(type: 'string', length: 255)]
     private $username;
 
+    
+    #[Assert\Length(min:3,max:50)]
     #[ORM\Column(type: 'string', length: 255)]
     private $firstname;
 
+    #[Assert\Length(min:3,max:50)]
     #[ORM\Column(type: 'string', length: 255)]
     private $lastname;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\Email(message: 'The email {{ value }} is not a valid email.')]
+    #[ORM\Column(type: 'string', length: 320)]
     private $email;
 
+    #[Assert\Length(min:3,max:50)]
     #[ORM\Column(type: 'string', length: 255)]
     private $password;
 
@@ -36,6 +50,11 @@ class User
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Article::class)]
     private $articles;
+
+   
+    #[Assert\IdenticalTo(propertyPath:"password", message:"Les deux mots de passe doivent etre identique")]
+    private $passwordConfirm;
+
 
     public function __construct()
     {
@@ -53,9 +72,20 @@ class User
         return $this->username;
     }
 
+    public function getPasswordConfirm(): ?string
+    {
+        return $this->passwordConfirm;
+    }
 
-    public function __toString(){
-        return $this->firstname.' '.$this->lastname;
+    public function setPasswordConfirm(string $passwordConfirm)
+    {
+        $this->passwordConfirm = $passwordConfirm;
+    }
+
+
+    public function __toString()
+    {
+        return $this->firstname . ' ' . $this->lastname;
     }
 
     public function setUsername(string $username): self
@@ -154,4 +184,24 @@ class User
 
         return $this;
     }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function getSalt()
+    {
+        return null;
+    }
+    public function eraseCredentials()
+    {
+        # code...
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
 }

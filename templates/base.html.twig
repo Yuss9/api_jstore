@@ -30,19 +30,25 @@
 					<div class="collapse navbar-collapse" id="navbarColor01">
 						<ul class="navbar-nav me-auto">
 							<li class="nav-item">
-								<a class="nav-link active" href="/">Home
+								<a class="nav-link active" href="/">Accueil
 									<span class="visually-hidden">(current)</span>
 								</a>
 							</li>
 						</ul>
+						{% if app.user %}
+							<a href="{{path('security_logout')}}" class="btn btn-success m-1">Deconnexion</a>
+
+						{% else %}
+							<a href="{{path('security_register')}}" class="btn btn-success m-1">Inscription</a>
+							<a href="{{path('security_login')}}" class="btn btn-success m-1">Connexion</a>
+						{% endif %}
 					</div>
 				</div>
 			</nav>
 		</header>
 
-		<div class="container-fluid"> 
-            {% block body %}{% endblock %}
-		</div>
-		
-        </body>
+		<div class="container-fluid"> {% block body %}{% endblock %}
+			</div>
+
+		</body>
 	</html>
